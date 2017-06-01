@@ -1,0 +1,26 @@
+<html>
+
+<head>
+</head>
+
+<body>
+    <script>
+        var dojoConfig = {
+            async: 1,
+            deps: [
+                "./built/index.js"
+            ],
+            packages: [{
+                name: "app",
+                location: location.pathname.replace(/\/[^/]+$/, '') + 'app',
+                main: "index"
+            }],
+            callback: () => {
+                require(["app"], app => app());
+            }
+        };
+    </script>
+    <script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+</body>
+
+</html>

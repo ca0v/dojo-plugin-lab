@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "removeComments": true,
+        "declaration": false,
+        "module": "amd",
+        "target": "es5",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "outFile": "./built/index.js",
+        "moduleResolution": "node"
+    }
+}
