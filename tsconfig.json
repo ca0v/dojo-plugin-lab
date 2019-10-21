@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "jsx": "react",
+        "jsxFactory": "dom",
         "removeComments": true,
         "declaration": false,
         "module": "amd",
