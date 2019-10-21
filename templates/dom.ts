@@ -8,22 +8,28 @@ export interface Dictionary<T> {
   [index: string]: T;
 }
 
-type Args = Dictionary<string|Dictionary<string>>;
+type Args = Dictionary<string | Function | Dictionary<string>>;
 
 export type ContentPaneFactory = (args: Args) => { setContent: Function; addChild: Function };
 
 export function dom(
   tag: string | ContentPaneFactory,
   args?: Args,
-  ...children: [HTMLElement | string | dijit.layout.ContentPane][]
+  ...children: [HTMLElement | string | dijit._WidgetBase][]
 ) {
   if (typeof tag === "string") {
     let element = document.createElement(tag);
     if (args) {
       Object.keys(args).forEach(key => {
         let value = args[key];
-        if (key === "class") key = "className";
-        element.setAttribute(key, value+"");
+        if (typeof value === "string") {
+          if (key === "class") key = "className";
+          element.setAttribute(key, value);
+        } else if (value instanceof Function) {
+          element.addEventListener(<any>key, <any>value);
+        } else {
+          element.setAttribute(key, value + "");
+        }
       });
     }
     if (children) {
@@ -73,6 +79,7 @@ export function TabContainer(args: Args) {
   return new dijitTabContainer(args || {});
 }
 
-export function ComboBox(args: Args) {
+// more specific typings to  account for `store` being an object
+export function ComboBox(args: { id?: string; value?: string; name: string; searchAttr?: string; store: any }) {
   return new dijitComboBox(args || {});
 }

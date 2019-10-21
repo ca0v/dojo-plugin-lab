@@ -28,9 +28,17 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
             if (args) {
                 Object.keys(args).forEach(function (key) {
                     var value = args[key];
-                    if (key === "class")
-                        key = "className";
-                    element_1.setAttribute(key, value + "");
+                    if (typeof value === "string") {
+                        if (key === "class")
+                            key = "className";
+                        element_1.setAttribute(key, value);
+                    }
+                    else if (value instanceof Function) {
+                        element_1.addEventListener(key, value);
+                    }
+                    else {
+                        element_1.setAttribute(key, value + "");
+                    }
                 });
             }
             if (children) {
@@ -159,6 +167,11 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
         "height": "50%",
         overflow: "auto"
     };
+    function trigger(topic) {
+        return function (args) { return alert(topic); };
+    }
+    var store = new dojo.store.Memory({});
+    [0, 1, 2, 3, 4, 5].map(function (v) { return store.add({ id: v, display: "Profile Group " + v }); });
     exports.titlePane = dom_2.dom(dom_2.TitlePane, { title: "Search & Options", class: "mapOptionTitlePane searchOptions", style: mapOptionTitlePane },
         dom_2.dom(dom_2.ContentPane, { class: "infoArea", style: infoArea },
             dom_2.dom(dom_2.AccordionContainer, { class: "map_tab_body" },
@@ -166,15 +179,15 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
                     dom_2.dom(dom_2.TabContainer, { tabPosition: "bottom" },
                         dom_2.dom(dom_2.ContentPane, { title: "Basic" },
                             dom_2.dom("div", null,
-                                dom_2.dom("button", { title: "Search for matching criteria" }, "Search"),
+                                dom_2.dom("button", { title: "Search for matching criteria", click: trigger("search.basic") }, "Search"),
                                 dom_2.dom("span", null, "\u00A0\u00A0"),
                                 dom_2.dom("ul", null,
                                     dom_2.dom("li", null,
-                                        dom_2.dom("button", { class: "urlField search advanced" }, "Advanced Search")),
+                                        dom_2.dom("button", { class: "urlField search advanced", click: trigger("search.advanced") }, "Advanced Search")),
                                     dom_2.dom("li", null,
-                                        dom_2.dom("button", { class: "urlField search extent" }, "Search in Extent")),
+                                        dom_2.dom("button", { class: "urlField search extent", click: trigger("search.extent") }, "Search in Extent")),
                                     dom_2.dom("li", null,
-                                        dom_2.dom("button", { class: "urlField search gis" }, "GIS Search"))))),
+                                        dom_2.dom("button", { class: "urlField search gis", click: trigger("search.gis") }, "GIS Search"))))),
                         dom_2.dom(dom_2.ContentPane, { title: "My Queries" }))),
                 dom_2.dom(dom_2.ContentPane, { title: "Layers" },
                     dom_2.dom(dom_2.TabContainer, { tabPosition: "bottom" },
@@ -185,7 +198,7 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
                                         dom_2.dom("tr", null,
                                             dom_2.dom("td", null,
                                                 dom_2.dom("label", { id: "layerGroupLabel" }, "Profile:"),
-                                                dom_2.dom(dom_2.ComboBox, { id: "layerGroup", value: "todo", name: "layerGroupSelect", searchAttr: "display" }))),
+                                                dom_2.dom(dom_2.ComboBox, { id: "layerGroup", value: "todo", name: "layerGroupSelect", searchAttr: "display", store: store }))),
                                         dom_2.dom("tr", null,
                                             dom_2.dom("td", null,
                                                 dom_2.dom("hr", null),

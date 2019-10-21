@@ -15,6 +15,13 @@ let infoArea = {
     overflow: "auto"
 }
 
+function trigger(topic: string) {
+    return (args: any) => alert(topic);
+}
+
+let store = new dojo.store.Memory<{ id: string, display: string }>({});
+[0, 1, 2, 3, 4, 5].map(v => store.add({ id: v, display: "Profile Group " + v }));
+
 export let titlePane =
     <TitlePane title="Search &amp; Options" class="mapOptionTitlePane searchOptions" style={mapOptionTitlePane}>
         <ContentPane class="infoArea" style={infoArea}>
@@ -23,12 +30,12 @@ export let titlePane =
                     <TabContainer tabPosition="bottom">
                         <ContentPane title="Basic">
                             <div>
-                                <button title="Search for matching criteria">Search</button>
+                                <button title="Search for matching criteria" click={trigger("search.basic")}>Search</button>
                                 <span>&nbsp;&nbsp;</span>
                                 <ul>
-                                    <li><button class="urlField search advanced">Advanced Search</button></li>
-                                    <li><button class="urlField search extent">Search in Extent</button></li>
-                                    <li><button class="urlField search gis">GIS Search</button></li>
+                                    <li><button class="urlField search advanced" click={trigger("search.advanced")}>Advanced Search</button></li>
+                                    <li><button class="urlField search extent" click={trigger("search.extent")}>Search in Extent</button></li>
+                                    <li><button class="urlField search gis" click={trigger("search.gis")}>GIS Search</button></li>
                                 </ul>
                             </div>
                         </ContentPane>
@@ -44,7 +51,7 @@ export let titlePane =
                                         <tr>
                                             <td>
                                                 <label id="layerGroupLabel">Profile:</label>
-                                                <ComboBox id="layerGroup" value="todo" name="layerGroupSelect" searchAttr="display"></ComboBox>
+                                                <ComboBox id="layerGroup" value="todo" name="layerGroupSelect" searchAttr="display" store={store}></ComboBox>
                                             </td>
                                         </tr>
                                         <tr>
@@ -92,7 +99,7 @@ export let titlePane =
                     </TabContainer>
                 </ContentPane>
                 <ContentPane title="Legend">
-                    <img/>
+                    <img />
                 </ContentPane>
                 <ContentPane title="Contents">
                     <table class="grid" cellpadding="2" cellspacing="0" border="0" style="height: auto; border-collapse: collapse; table-layout: fixed;">
