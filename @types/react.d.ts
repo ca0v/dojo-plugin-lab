@@ -6,6 +6,20 @@
 declare module React {}
 declare module JSX {
   interface IntrinsicElements {
+    img: any;
+    input: any;
+    hr: any;
+    table: any;
+    tbody: any;
+    thead: any;
+    th: any;
+    tr: any;
+    td: any;
+    label: any;
     div: any;
+    span: any;
+    ul: any;
+    li: any;
+    button: any;
   }
 }
