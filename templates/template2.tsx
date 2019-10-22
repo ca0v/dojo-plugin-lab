@@ -51,7 +51,7 @@ export let titlePane =
                                         <tr>
                                             <td>
                                                 <label id="layerGroupLabel">Profile:</label>
-                                                <ComboBox id="layerGroup" value="todo" name="layerGroupSelect" searchAttr="display" store={store}></ComboBox>
+                                                <ComboBox id="layerGroup" value="todo" name="layerGroupSelect" searchAttr="display" store={store} onChange={trigger("group")}></ComboBox>
                                             </td>
                                         </tr>
                                         <tr>

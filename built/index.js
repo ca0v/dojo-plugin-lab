@@ -29,8 +29,6 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
                 Object.keys(args).forEach(function (key) {
                     var value = args[key];
                     if (typeof value === "string") {
-                        if (key === "class")
-                            key = "className";
                         element_1.setAttribute(key, value);
                     }
                     else if (value instanceof Function) {
@@ -51,6 +49,9 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
                     }
                     else if (c instanceof dijit._WidgetBase) {
                         element_1.appendChild(c.domNode);
+                    }
+                    else if (c instanceof Array) {
+                        c.forEach(function (item) { return element_1.appendChild(item); });
                     }
                     else {
                         throw "unkown child";
@@ -198,7 +199,7 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
                                         dom_2.dom("tr", null,
                                             dom_2.dom("td", null,
                                                 dom_2.dom("label", { id: "layerGroupLabel" }, "Profile:"),
-                                                dom_2.dom(dom_2.ComboBox, { id: "layerGroup", value: "todo", name: "layerGroupSelect", searchAttr: "display", store: store }))),
+                                                dom_2.dom(dom_2.ComboBox, { id: "layerGroup", value: "todo", name: "layerGroupSelect", searchAttr: "display", store: store, onChange: trigger("group") }))),
                                         dom_2.dom("tr", null,
                                             dom_2.dom("td", null,
                                                 dom_2.dom("hr", null),
