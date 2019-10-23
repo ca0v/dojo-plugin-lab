@@ -15,9 +15,12 @@ define("app/test-plugin", ["require", "exports", "app/plugin!echo", "app/plugin"
     }
     exports.run = run;
 });
-define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/AccordionContainer", "dijit/layout/ContentPane", "dijit/layout/TabContainer", "dijit/form/ComboBox"], function (require, exports, dijitTitlePane, dijitAccordionContainer, dijitContentPane, dijitTabContainer, dijitComboBox) {
+define("templates/dom", ["require", "exports", "dijit/registry", "dijit/TitlePane", "dijit/layout/AccordionContainer", "dijit/layout/ContentPane", "dijit/layout/TabContainer", "dijit/form/ComboBox"], function (require, exports, registry, dijitTitlePane, dijitAccordionContainer, dijitContentPane, dijitTabContainer, dijitComboBox) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var rules = {
+        style: asStyle,
+    };
     function dom(tag, args) {
         var children = [];
         for (var _i = 2; _i < arguments.length; _i++) {
@@ -27,7 +30,7 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
             var element_1 = document.createElement(tag);
             if (args) {
                 Object.keys(args).forEach(function (key) {
-                    var value = args[key];
+                    var value = rules[key] ? rules[key](args[key]) : args[key];
                     if (typeof value === "string") {
                         element_1.setAttribute(key, value);
                     }
@@ -39,43 +42,65 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
                     }
                 });
             }
-            if (children) {
-                children.forEach(function (c) {
-                    if (typeof c === "string") {
-                        element_1.appendChild(document.createTextNode(c));
-                    }
-                    else if (c instanceof HTMLElement) {
-                        element_1.appendChild(c);
-                    }
-                    else if (c instanceof dijit._WidgetBase) {
-                        element_1.appendChild(c.domNode);
-                    }
-                    else if (c instanceof Array) {
-                        c.forEach(function (item) { return element_1.appendChild(item); });
-                    }
-                    else {
-                        throw "unkown child";
-                    }
-                });
-            }
+            var addChildren_1 = function (children) {
+                children &&
+                    children.forEach(function (c) {
+                        if (typeof c === "string") {
+                            element_1.appendChild(document.createTextNode(c));
+                        }
+                        else if (c instanceof HTMLElement) {
+                            element_1.appendChild(c);
+                        }
+                        else if (c instanceof dijit._WidgetBase) {
+                            element_1.appendChild(c.domNode);
+                        }
+                        else if (c instanceof Array) {
+                            addChildren_1(c);
+                        }
+                        else {
+                            console.log("addChildren cannot add to dom node", c);
+                        }
+                    });
+            };
+            children && addChildren_1(children);
             return element_1;
         }
         {
             var element_2 = tag(args);
-            if (children) {
-                children.forEach(function (c) {
-                    if (typeof c === "string" || c instanceof HTMLElement) {
-                        element_2.setContent(c);
-                    }
-                    else {
-                        element_2.addChild(c);
-                    }
-                });
-            }
+            var addChildren_2 = function (children) {
+                children &&
+                    children.forEach(function (c) {
+                        if (typeof c === "string" || c instanceof HTMLElement) {
+                            element_2.setContent(c);
+                        }
+                        else if (c instanceof Array) {
+                            addChildren_2(c);
+                        }
+                        else if (typeof c === "object") {
+                            element_2.addChild(c);
+                        }
+                        else {
+                            console.log("addChildren cannot add to widget", c);
+                        }
+                    });
+            };
+            children && addChildren_2(children);
             return element_2;
         }
     }
     exports.dom = dom;
+    function getWidget(container, selector) {
+        if (selector)
+            container = container.querySelector(selector);
+        if (!container)
+            return null;
+        return registry.byNode(container);
+    }
+    exports.getWidget = getWidget;
+    function byNode(node) {
+        return registry.byNode(node);
+    }
+    exports.byNode = byNode;
     function TitlePane(args) {
         return new dijitTitlePane(args || {});
     }
@@ -96,6 +121,13 @@ define("templates/dom", ["require", "exports", "dijit/TitlePane", "dijit/layout/
         return new dijitComboBox(args || {});
     }
     exports.ComboBox = ComboBox;
+    function asStyle(o) {
+        if (typeof o === "string")
+            return 0;
+        return Object.keys(o)
+            .map(function (k) { return k + ":" + o[k]; })
+            .join(";");
+    }
 });
 define("templates/template1", ["require", "exports", "templates/dom"], function (require, exports, dom_1) {
     "use strict";
@@ -240,14 +272,59 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
                                 dom_2.dom("td", null, "Icon of this marker"),
                                 dom_2.dom("td", null, "Description of this marker"))))))));
 });
-define("app/index", ["require", "exports", "app/test-plugin", "templates/template1", "templates/template2", "dojo/domReady!"], function (require, exports, test, template1_1, template2_1) {
+define("tests/templates", ["require", "exports", "templates/dom"], function (require, exports, dom_3) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.jsonStyleTest = function () {
+        var style = { background: "black", color: "white" };
+        return dom_3.dom("div", { style: style }, "White Font, Black Background?");
+    };
+    exports.checkedAsBoolTest = function () {
+        return dom_3.dom("input", { checked: true });
+    };
+    exports.nestedElements = function () {
+        return dom_3.dom("div", null,
+            dom_3.dom("span", null,
+                "I am ",
+                dom_3.dom("b", null, "Bold"),
+                " and ",
+                dom_3.dom("i", null, "Italic")));
+    };
+    exports.mixedTypes = function () {
+        return dom_3.dom("div", null,
+            dom_3.dom("label", { class: "outside" }, "Outside CP"),
+            dom_3.dom(dom_3.ContentPane, null,
+                dom_3.dom("span", { class: "inside" }, "Inside CP")));
+    };
+});
+define("app/index", ["require", "exports", "app/test-plugin", "templates/template1", "templates/template2", "tests/templates", "chai", "dojo/domReady!"], function (require, exports, test, template1_1, template2_1, templates_1, chai_1) {
+    "use strict";
+    describe("tsx tests", function () {
+        it("tests style", function () {
+            var div = templates_1.jsonStyleTest();
+            chai_1.assert.equal(div.style.backgroundColor, "black");
+            chai_1.assert.equal(div.style.color, "white");
+        });
+        it("tests boolean", function () {
+            var input = templates_1.checkedAsBoolTest();
+            chai_1.assert.equal(input.checked, true);
+        });
+        it("tests nested", function () {
+            chai_1.assert.equal(templates_1.nestedElements().outerHTML, "<div><span>I am <b>Bold</b> and <i>Italic</i></span></div>");
+        });
+        it("tests mixed types", function () {
+            var markup = templates_1.mixedTypes();
+            chai_1.assert.exists(markup.querySelector("label.outside"), "outside label preserved");
+            chai_1.assert.exists(markup.querySelector("span.inside"), "inside span preserved");
+        });
+    });
     function run() {
         test.run();
         document.body.appendChild(template1_1.titlePan.domNode);
         document.body.appendChild(template2_1.titlePane.domNode);
         template1_1.titlePan.startup();
         template2_1.titlePane.startup();
+        runMochaTests();
     }
     return run;
 });

@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/ca0v/dojo-plugin-lab#readme",
   "devDependencies": {
+    "@types/chai": "^4.2.4",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
     "typescript": "^3.6.4"
   }
 }
