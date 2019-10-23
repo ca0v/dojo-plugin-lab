@@ -4,11 +4,18 @@ import test = require("./test-plugin");
 import { titlePan as template1 } from "../templates/template1";
 import { titlePane as template2 } from "../templates/template2";
 import "dojo/domReady!";
-import { jsonStyleTest, checkedAsBoolTest, nestedElements, mixedTypes } from "../tests/templates";
+import { jsonStyleTest, checkedAsBoolTest, nestedElements, mixedTypes, inlineStyleTest } from "../tests/templates";
 import { assert } from "chai";
 
 describe("tsx tests", () => {
-  it("tests style", () => {
+
+  it("tests inline style", () => {
+    let div = inlineStyleTest();
+    assert.equal(div.style.backgroundColor, "black");
+    assert.equal(div.style.color, "white");
+  });
+
+  it("tests json style", () => {
     let div = jsonStyleTest();
     assert.equal(div.style.backgroundColor, "black");
     assert.equal(div.style.color, "white");
@@ -27,7 +34,8 @@ describe("tsx tests", () => {
     let markup = mixedTypes();
     assert.exists(markup.querySelector("label.outside"), "outside label preserved");
     assert.exists(markup.querySelector("span.inside"), "inside span preserved");
-  })
+  });
+
 
 });
 

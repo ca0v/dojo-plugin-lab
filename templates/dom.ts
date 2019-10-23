@@ -142,7 +142,7 @@ export function ComboBox(args: {
 }
 
 function asStyle(o: any) {
-  if (typeof o === "string") return 0;
+  if (typeof o === "string") return o;
   return Object.keys(o)
     .map(k => `${k}:${o[k]}`)
     .join(";");

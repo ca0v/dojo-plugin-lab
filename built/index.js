@@ -123,7 +123,7 @@ define("templates/dom", ["require", "exports", "dijit/registry", "dijit/TitlePan
     exports.ComboBox = ComboBox;
     function asStyle(o) {
         if (typeof o === "string")
-            return 0;
+            return o;
         return Object.keys(o)
             .map(function (k) { return k + ":" + o[k]; })
             .join(";");
@@ -275,6 +275,9 @@ define("templates/template2", ["require", "exports", "templates/dom"], function 
 define("tests/templates", ["require", "exports", "templates/dom"], function (require, exports, dom_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.inlineStyleTest = function () {
+        return dom_3.dom("div", { style: "background:black;color:white" }, "White Font, Black Background?");
+    };
     exports.jsonStyleTest = function () {
         var style = { background: "black", color: "white" };
         return dom_3.dom("div", { style: style }, "White Font, Black Background?");
@@ -300,7 +303,12 @@ define("tests/templates", ["require", "exports", "templates/dom"], function (req
 define("app/index", ["require", "exports", "app/test-plugin", "templates/template1", "templates/template2", "tests/templates", "chai", "dojo/domReady!"], function (require, exports, test, template1_1, template2_1, templates_1, chai_1) {
     "use strict";
     describe("tsx tests", function () {
-        it("tests style", function () {
+        it("tests inline style", function () {
+            var div = templates_1.inlineStyleTest();
+            chai_1.assert.equal(div.style.backgroundColor, "black");
+            chai_1.assert.equal(div.style.color, "white");
+        });
+        it("tests json style", function () {
             var div = templates_1.jsonStyleTest();
             chai_1.assert.equal(div.style.backgroundColor, "black");
             chai_1.assert.equal(div.style.color, "white");

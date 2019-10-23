@@ -1,7 +1,11 @@
 import { dom, ContentPane } from "../templates/dom";
 
+export let inlineStyleTest = () => {
+    return <div style="background:black;color:white">White Font, Black Background?</div> as HTMLDivElement
+}
+
 export let jsonStyleTest = () => {
-    let style = { background: "black", color: "white" };
+    let style = { background: "black", color: "white" } as any;
     return <div style={style}>White Font, Black Background?</div> as HTMLDivElement
 }
 
